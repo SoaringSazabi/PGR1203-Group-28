@@ -5,8 +5,8 @@ public class game{
     final static int trapType = 2;
     final static int riverLength = 100;
     final static int playerLength = 2;
-    final static char trapDisplay = "#";
-    final static char currentDisplay = "C";
+    final static String trapDisplay = "#";
+    final static String currentDisplay = "C";
 
     private int turn;
     private cell[] River = new cell[100];
@@ -15,7 +15,6 @@ public class game{
 
     public game(String pn1, String pn2){
        turn = 0;
-       
        player p1 = new player(pn1);
        player p2 = new player(pn2);
        Players[0] = p1;
@@ -26,6 +25,17 @@ public class game{
        }
     }
     
+    /*
+     * Returns player object of the player whose turn it is
+    */
+    public player getCurrentPlayer(){
+        int currPlayer = 0; //indicates current player(1 or 2) for print statement below
+        if(turn % 2 == 0){
+            currPlayer = 1;
+        }
+        return Players[currPlayer];
+    }
+    
     public int getTurn(){
         return turn;
     }
@@ -34,12 +44,24 @@ public class game{
         turn = t;
     }
 
+    /*
+     * Adjusts chosen player's position 
+     */
+    public void movePlayer(int distance){
+        int currPos = getCurrentPlayer().getPos();
+        getCurrentPlayer().setPos(currPos+distance);
+    }
+
     public int rollDice(){
         return dice.nextInt(5) + 1;
     }
 
     public void displayRiver(){
-
+        System.out.printf("\nPlayer 1's position: %d\n",Players[0].getPos());
+        System.out.printf("Player 2's position: %d\n",Players[1].getPos());
+        System.out.println("====================================================================================================");
+        System.out.println("====================================================================================================");
+        System.out.printf("\nPlayer %s please press 1 to roll the dice.\n",getCurrentPlayer().getName());
     }
 
     public void displayEndScreen(){
