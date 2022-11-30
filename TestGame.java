@@ -37,6 +37,7 @@ public class TestGame{
                     game.displayRiver();
                     input.nextLine();
                     game.movePlayer(game.rollDice());
+                    game.checkCell();
                 }
                 game.displayEndScreen();
             }

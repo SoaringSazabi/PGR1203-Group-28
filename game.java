@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.*;
 public class game{
     
     final static int currentType = 1;
@@ -48,34 +49,52 @@ public class game{
         return Players[currPlayer];
     }
 
+    /*
+     * Used to create cell list that will act as the river 
+     * Number of currents and traps are determined by random fucntion with a max of 15 and minimum of 5 for each
+     * Uses for loops to create blank,current and trap cells
+     */
     public cell[] createRiver(){
-        cell[] tempRiver = new cell[100];
         int C = random.nextInt(maxCurrent)+5;
         int T = random.nextInt(maxTrap)+5;
 
+        //cell[] to be returned later
+        cell[] tempRiver = new cell[riverLength];
+
+
+        //Initialises entire river with blank cells
         for(int l = 0; l < riverLength; l++){
             tempRiver[l] = new cell(0, 0);
         }
 
+        //Sets all current cells
         for(int i = 0; i < C; i++){
             tempRiver[i].setType(currentType);
-            tempRiver[i].setEffect(random.nextInt(10));
+            tempRiver[i].setEffect(random.nextInt(9)+1);
         }
-        for(int j = C+1; j-C < T; j++){
+
+        //Sets all trap cells
+        for(int j = C; j-C < T; j++){
             tempRiver[j].setType(trapType);
-            tempRiver[j].setEffect(random.nextInt(10));
+            tempRiver[j].setEffect(random.nextInt(9)+1);
         }
         
+        Collections.shuffle(Arrays.asList(tempRiver));//Shuffle all cells
+
         return tempRiver;
     }
+
     /*
      * Adjusts chosen player's position 
      * If the input distance moves the player past cell 100 the players position will be set to 100
      */
     public void movePlayer(int distance){
         int currPos = getCurrentPlayer().getPos();
-        if(currPos + distance > 100){
-            getCurrentPlayer().setPos(100);
+        if(currPos + distance > 99){
+            getCurrentPlayer().setPos(99);
+        }
+        else if(currPos + distance < 0){
+            getCurrentPlayer().setPos(0);
         }
         else{
             getCurrentPlayer().setPos(currPos + distance);
@@ -83,15 +102,35 @@ public class game{
     }
 
     /*
+     * Checks the cell player has landed on and adjusts their position if 
+     */
+    public void checkCell(){
+        if(River[getCurrentPlayer().getPos()].getType() == currentType){
+            System.out.println("++++++++++++++++++++++++++++++++++++++++++++");
+            System.out.printf("\nPlayer %s has landed on a Current, you have been moved %d spaces forward\n",getCurrentPlayer().getName(),River[getCurrentPlayer().getPos()].getEffect());
+            System.out.println("++++++++++++++++++++++++++++++++++++++++++++");
+            movePlayer(River[getCurrentPlayer().getPos()].getEffect());
+        }
+        else if(River[getCurrentPlayer().getPos()].getType() == trapType){
+            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            System.out.printf("\nPlayer %s has landed on a Trap, you have been moved %d spaces backwards\n",getCurrentPlayer().getName(),River[getCurrentPlayer().getPos()].getEffect());
+            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            movePlayer(0 - River[getCurrentPlayer().getPos()].getEffect());
+        }
+    }
+
+    /*
      * Generates random number to be used as dice rolling feature
      */
     public int rollDice(){
-        return random.nextInt(5) + 1;
+        int dice = random.nextInt(5) + 1;
+        System.out.printf("\nYou rolled a %d\n",dice);
+        return dice;
     }
 
     public void displayRiver(){
-        System.out.printf("\nPlayer 1's position: %d\n",Players[0].getPos());
-        System.out.printf("Player 2's position: %d\n",Players[1].getPos());
+        System.out.printf("\nPlayer 1's position: %d\n",Players[0].getPos()+1);
+        System.out.printf("Player 2's position: %d\n",Players[1].getPos()+1);
         System.out.println("====================================================================================================");
         for(int i = 0; i<99;i++){
             if(Players[0].getPos() == i ){
@@ -118,8 +157,13 @@ public class game{
     }
 
     public void displayEndScreen(){
+        System.out.println(" ");
+        System.out.println("|||||||||||||||||||||||||");
         System.out.println("Thanks for playing!");
-        System.out.printf("The winner is %s!!\n",Players[checkWinner()-1].getName());
+        System.out.printf("\nThe winner is %s!!\n",Players[checkWinner()-1].getName());
+        System.out.println("|||||||||||||||||||||||||");
+        System.out.println(" ");
+
     }
    
     /*
@@ -130,10 +174,10 @@ public class game{
      * 2 if player 2 has won
      */
     public int checkWinner(){
-        if(Players[0].getPos() >= 100){
+        if(Players[0].getPos() == 99){
             return 1;
         }
-        else if(Players[1].getPos() >= 100){
+        else if(Players[1].getPos() == 99){
             return 2;
         }
         else{
