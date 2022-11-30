@@ -46,12 +46,21 @@ public class game{
 
     /*
      * Adjusts chosen player's position 
+     * If the input distance moves the player past cell 100 the players position will be set to 100
      */
     public void movePlayer(int distance){
         int currPos = getCurrentPlayer().getPos();
-        getCurrentPlayer().setPos(currPos+distance);
+        if(currPos + distance > 100){
+            getCurrentPlayer().setPos(100);
+        }
+        else{
+            getCurrentPlayer().setPos(currPos + distance);
+        }
     }
 
+    /*
+     * Generates random number to be used as dice rolling feature
+     */
     public int rollDice(){
         return dice.nextInt(5) + 1;
     }
@@ -60,12 +69,25 @@ public class game{
         System.out.printf("\nPlayer 1's position: %d\n",Players[0].getPos());
         System.out.printf("Player 2's position: %d\n",Players[1].getPos());
         System.out.println("====================================================================================================");
+        for(int i = 0; i<99;i++){
+            if(River[i].getType() == 1){
+                System.out.print("C");
+            }
+            else if(River[i].getType() == 2){
+                System.out.print("#");  
+            }
+            else{
+                System.out.print(" ");
+            }
+        }
+        System.out.println("");
         System.out.println("====================================================================================================");
-        System.out.printf("\nPlayer %s please press 1 to roll the dice.\n",getCurrentPlayer().getName());
+        System.out.printf("\nPlayer %s please press enter to roll the dice.\n",getCurrentPlayer().getName());
     }
 
     public void displayEndScreen(){
-
+        System.out.println("Thanks for playing!");
+        System.out.printf("The winner is %s!!\n",Players[checkWinner()-1].getName());
     }
 
     public player[] getPlayers(){
@@ -80,10 +102,10 @@ public class game{
      * 2 if player 2 has won
      */
     public int checkWinner(){
-        if(Players[0].getPos() == 100){
+        if(Players[0].getPos() >= 100){
             return 1;
         }
-        else if(Players[1].getPos() == 100){
+        else if(Players[1].getPos() >= 100){
             return 2;
         }
         else{

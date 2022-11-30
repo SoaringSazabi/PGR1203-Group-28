@@ -1,6 +1,6 @@
 public class cell{
-    private int type;
-    private int effect;
+    private int type;   //0 = blank cell 1 = current 2 = Trap
+    private int effect; //Represents how many spaces the player will move if this cell is a trap or current
 
     public cell(){
         type = 0;

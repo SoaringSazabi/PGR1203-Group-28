@@ -4,7 +4,6 @@ public class TestGame{
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         boolean main = true; //main menu loop
-        boolean gameLoop = false; //game loop
         int menuChoice; // stores main menu choice
         String p1name;
         String p2name;
@@ -32,14 +31,14 @@ public class TestGame{
                 System.out.println("Please enter player 2's name: ");
                 p2name = input.nextLine();
                 game game = new game(p1name, p2name);
-                gameLoop = true;
 
-                while(gameLoop){
+                while(game.checkWinner() == 0){
                     game.setTurn(game.getTurn() + 1);
                     game.displayRiver();
                     input.nextLine();
                     game.movePlayer(game.rollDice());
                 }
+                game.displayEndScreen();
             }
         }
         input.close();
