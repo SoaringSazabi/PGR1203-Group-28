@@ -6,7 +6,7 @@ public class player{
     public player(String n){
         name = n;
         score = 0;
-        pos = 0;
+        pos = 1;
     }
 
     public String getName(){

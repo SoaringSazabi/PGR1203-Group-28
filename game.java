@@ -5,13 +5,15 @@ public class game{
     final static int trapType = 2;
     final static int riverLength = 100;
     final static int playerLength = 2;
-    final static String trapDisplay = "#";
+    final static String trapDisplay = "T";
     final static String currentDisplay = "C";
+    final static int maxCurrent = 10;
+    final static int maxTrap = 10;
 
     private int turn;
     private cell[] River = new cell[100];
     private player[] Players = new player[2];
-    private Random dice = new Random(); //random object used in rollDice and to generate cell types.
+    private Random random = new Random(); //random object used in rollDice and to generate cell types.
 
     public game(String pn1, String pn2){
        turn = 0;
@@ -20,20 +22,7 @@ public class game{
        Players[0] = p1;
        Players[1] = p2;
 
-       for(int i = 0; i<100; i++){
-        River[i] = new cell();
-       }
-    }
-    
-    /*
-     * Returns player object of the player whose turn it is
-    */
-    public player getCurrentPlayer(){
-        int currPlayer = 0; //indicates current player(1 or 2) for print statement below
-        if(turn % 2 == 0){
-            currPlayer = 1;
-        }
-        return Players[currPlayer];
+       River = createRiver();
     }
     
     public int getTurn(){
@@ -44,6 +33,41 @@ public class game{
         turn = t;
     }
 
+    public player[] getPlayers(){
+        return Players;
+    }
+
+        /*
+     * Returns player object of the player whose turn it is
+    */
+    public player getCurrentPlayer(){
+        int currPlayer = 0; //indicates current player(1 or 2) for print statement below
+        if(turn % 2 == 0){
+            currPlayer = 1;
+        }
+        return Players[currPlayer];
+    }
+
+    public cell[] createRiver(){
+        cell[] tempRiver = new cell[100];
+        int C = random.nextInt(maxCurrent)+5;
+        int T = random.nextInt(maxTrap)+5;
+
+        for(int l = 0; l < riverLength; l++){
+            tempRiver[l] = new cell(0, 0);
+        }
+
+        for(int i = 0; i < C; i++){
+            tempRiver[i].setType(currentType);
+            tempRiver[i].setEffect(random.nextInt(10));
+        }
+        for(int j = C+1; j-C < T; j++){
+            tempRiver[j].setType(trapType);
+            tempRiver[j].setEffect(random.nextInt(10));
+        }
+        
+        return tempRiver;
+    }
     /*
      * Adjusts chosen player's position 
      * If the input distance moves the player past cell 100 the players position will be set to 100
@@ -62,7 +86,7 @@ public class game{
      * Generates random number to be used as dice rolling feature
      */
     public int rollDice(){
-        return dice.nextInt(5) + 1;
+        return random.nextInt(5) + 1;
     }
 
     public void displayRiver(){
@@ -70,15 +94,23 @@ public class game{
         System.out.printf("Player 2's position: %d\n",Players[1].getPos());
         System.out.println("====================================================================================================");
         for(int i = 0; i<99;i++){
-            if(River[i].getType() == 1){
-                System.out.print("C");
+            if(Players[0].getPos() == i ){
+                System.out.print("1");
             }
-            else if(River[i].getType() == 2){
-                System.out.print("#");  
+            else if(Players[1].getPos() == i){
+                System.out.print("2");
             }
             else{
-                System.out.print(" ");
-            }
+                if(River[i].getType() == currentType){
+                    System.out.print(currentDisplay);  
+                }
+                else if(River[i].getType() == trapType){
+                    System.out.print(trapDisplay);  
+                }
+                else{
+                    System.out.print(" ");
+                }
+            }  
         }
         System.out.println("");
         System.out.println("====================================================================================================");
@@ -88,10 +120,6 @@ public class game{
     public void displayEndScreen(){
         System.out.println("Thanks for playing!");
         System.out.printf("The winner is %s!!\n",Players[checkWinner()-1].getName());
-    }
-
-    public player[] getPlayers(){
-        return Players;
     }
    
     /*
