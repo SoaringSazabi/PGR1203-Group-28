@@ -1,5 +1,11 @@
-import java.util.Random;
+import java.util.Random; 
+import java.util.Scanner;
 import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 public class game{
     
     final static int currentType = 1;
@@ -11,13 +17,15 @@ public class game{
     final static int maxCurrent = 10;
     final static int maxTrap = 10;
 
+    private Scanner input = new Scanner(System.in);
     private int turn;
     private cell[] River = new cell[100];
     private player[] Players = new player[2];
     private Random random = new Random(); //random object used in rollDice and to generate cell types.
+    private File file = new File("highScores.txt");
 
     public game(String pn1, String pn2){
-       turn = 0;
+       turn = 1;
        player p1 = new player(pn1);
        player p2 = new player(pn2);
        Players[0] = p1;
@@ -30,8 +38,8 @@ public class game{
         return turn;
     }
 
-    public void setTurn(int t) {
-        turn = t;
+    public void nextTurn() {
+        turn += 1;
     }
 
     public player[] getPlayers(){
@@ -129,6 +137,7 @@ public class game{
     }
 
     public void displayRiver(){
+        System.out.printf("\n Turn: %d",turn);
         System.out.printf("\nPlayer 1's position: %d\n",Players[0].getPos()+1);
         System.out.printf("Player 2's position: %d\n",Players[1].getPos()+1);
         System.out.println("====================================================================================================");
@@ -160,7 +169,7 @@ public class game{
         System.out.println(" ");
         System.out.println("|||||||||||||||||||||||||");
         System.out.println("Thanks for playing!");
-        System.out.printf("\nThe winner is %s!!\n",Players[checkWinner()-1].getName());
+        System.out.printf("\nThe winner is %s with a score of: %d!!\n",Players[checkWinner()].getName(),Players[checkWinner()].getScore());
         System.out.println("|||||||||||||||||||||||||");
         System.out.println(" ");
 
@@ -169,22 +178,70 @@ public class game{
     /*
      * Checks if either player has reached the finish line(position 100)
      * Return:
-     * 0 if no players have won yet
-     * 1 if player 1 has won
-     * 2 if player 2 has won
+     * -1 if no players have won yet
+     * 0 if player 1 has won
+     * 1 if player 2 has won
      */
     public int checkWinner(){
         if(Players[0].getPos() == 99){
-            return 1;
+            return 0;
         }
         else if(Players[1].getPos() == 99){
-            return 2;
+            return 1;
         }
         else{
-            return 0;
+            return -1;
         }
     }
 
+    /*
+     * Sets all players scores at the end of the game
+     * Score is calculated:
+     * turn < 10 = 1000pts
+     * turn 10 - 20 = 1000pts - (100pts for every 2 turns after the 10th turn)
+     * turn 20+ = 100pts
+     */
+    public void setScores(){ 
+        int score;
+        int pTurn;
+        if(turn % 2 == 0){
+            pTurn = turn / 2;
+        }
+        else{
+            pTurn = (turn-1)/ 2;
+        } 
 
+        if(pTurn <= 15){
+            score = 1000;
+        }
+        else if(pTurn > 15 && pTurn <25 ){
+            score = 500;
+        }
+        else if(pTurn > 25 && pTurn <50){
+            score = 250;
+        }
+        else{
+            score = 100;
+        }
+        Players[checkWinner()].setScore(score);
+    }
+
+    public void checkScores(){
+        if(checkWinner() >= 0){
+            writeScore(Players[checkWinner()]);
+        }
+    }
+
+    public void writeScore(player Player){
+        try{
+            FileWriter fw = new FileWriter(file,true);
+            PrintWriter pw = new PrintWriter(fw);
+
+            pw.printf("\n%s  :  %d\n",Player.getName(),Player.getScore());
+            pw.close();
+        } catch(IOException e){
+            System.out.println("Error: writeScore");
+        }
+    }
 
 }

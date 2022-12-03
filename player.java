@@ -2,11 +2,13 @@ public class player{
     private int score;
     private String name;
     private int pos;
+    private int coins;
 
     public player(String n){
         name = n;
         score = 0;
         pos = 0;
+        coins = 100;
     }
 
     public String getName(){
@@ -31,5 +33,13 @@ public class player{
 
     public void setPos(int p){
         pos = p;
+    }
+
+    public int getCoins(){
+        return coins;
+    }
+
+    public void setCoins(int c){
+        coins = c;
     }
 }
