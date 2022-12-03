@@ -8,19 +8,21 @@ import java.io.PrintWriter;
 
 public class game{
     
-    final static int currentType = 1;
-    final static int trapType = 2;
-    final static int riverLength = 100;
-    final static int playerLength = 2;
-    final static String trapDisplay = "T";
-    final static String currentDisplay = "C";
-    final static int maxCurrent = 10;
-    final static int maxTrap = 10;
+    private final static int currentType = 1;
+    private final static int trapType = 2;
+    private final static int riverLength = 100;
+    private final static int playerLength = 2;
+    private final static String trapDisplay = "T";
+    private final static String currentDisplay = "C";
+    private final static int maxCurrent = 10;
+    private final static int maxTrap = 10;
+    private final static int[] milestones = {24,49,74,99};
 
     private Scanner input = new Scanner(System.in);
     private int turn;
     private cell[] River = new cell[100];
-    private player[] Players = new player[2];
+    private player[] Players = new player[playerLength];
+    private int[] bets = new int[4];
     private Random random = new Random(); //random object used in rollDice and to generate cell types.
     private File file = new File("highScores.txt");
 
@@ -30,6 +32,10 @@ public class game{
        player p2 = new player(pn2);
        Players[0] = p1;
        Players[1] = p2;
+       
+       for(int i = 0;i<bets.length;i++){
+        bets[i] = 0;
+       }
 
        River = createRiver();
     }
@@ -169,7 +175,7 @@ public class game{
         System.out.println(" ");
         System.out.println("|||||||||||||||||||||||||");
         System.out.println("Thanks for playing!");
-        System.out.printf("\nThe winner is %s with a score of: %d!!\n",Players[checkWinner()].getName(),Players[checkWinner()].getScore());
+        System.out.printf("\nThe winner is %s with a score of: %d and %d coins!!\n",Players[checkWinner()].getName(),Players[checkWinner()].getScore(),Players[checkWinner()].getCoins());
         System.out.println("|||||||||||||||||||||||||");
         System.out.println(" ");
 
@@ -191,6 +197,69 @@ public class game{
         }
         else{
             return -1;
+        }
+    }
+
+    public void setBets(){
+        for(int i = 0;i<bets.length;i++){
+            for(int j = 0; j <Players.length;j++){
+                int num = -1;
+                Boolean betCheck = true;
+                System.out.printf("\nPlayer %s you have %d coins how many would you like to bet on milestone %d\n!You may not bet more than the amount of coins you have!\n",Players[j].getName(),Players[j].getCoins(),i+1);
+                while(betCheck){
+                    
+                    if(num >= 0 && num <= Players[j].getCoins()){
+                        betCheck = false;
+                        bets[i] += num;
+                        Players[j].setCoins(Players[j].getCoins()-num);
+                        break;
+                    }
+                    else if(num == -1){
+                        try{
+                            num = Integer.parseInt(input.nextLine()) ;
+                        }
+                        catch(NumberFormatException exception){
+                            System.out.println("Please enter a NUMBER");
+                        }                
+                    }
+                    else{
+                        System.out.println("Please enter a valid amount");
+                        try{
+                            num = Integer.parseInt(input.nextLine()) ;
+                        }
+                        catch(NumberFormatException exception){
+                            System.out.println("Please enter a NUMBER");
+                        }
+                    }
+                }
+            }
+        }
+
+        for(int i = 0;i<bets.length;i++){
+            System.out.printf("\nMilestone %d has a total bet of %d\n",i+1,bets[i]);
+        }
+        System.out.println(" ");
+        System.out.println("The game will now begin! Have fun!");
+    }
+    public void checkMileStone(){
+        int ms = -1;
+
+        for(int i = 0;i<milestones.length;i++){
+            if(getCurrentPlayer().getPos() == milestones[i]){
+                ms = i;
+                break;
+            }
+        }
+
+        if(ms != -1){
+            if(bets[ms] == 0){
+                System.out.printf("\nSorry %s you landed on a milestone that has 0 coins on it\n",getCurrentPlayer().getName());
+            }
+            else{
+                System.out.printf("\nCongratulations %s you have landed on a milestone, you've earned %d coins\n",getCurrentPlayer().getName(),bets[ms]);
+            }
+            getCurrentPlayer().setCoins(getCurrentPlayer().getCoins() + bets[ms]); 
+            bets[ms] = 0;
         }
     }
 

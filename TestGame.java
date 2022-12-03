@@ -20,6 +20,7 @@ public class TestGame{
             //Loop checks if user input a valid menu choice
             //Will continually ask user to input a valid choice if they have not
             while(menuCheck){
+
                 if(menuChoice <= 3 && menuChoice >= 1){
                     menuCheck = false;
                     break;
@@ -63,11 +64,13 @@ public class TestGame{
             //Creates and starts game if option 1 was choosen by user
             if(start){
                 game game = new game(p1name, p2name);
+                game.setBets();
                 while(game.checkWinner() == -1){
                     game.displayRiver();
                     input.nextLine();
                     game.movePlayer(game.rollDice());
                     game.checkCell();
+                    game.checkMileStone();
                     game.nextTurn();
                 }
                 game.setScores();
