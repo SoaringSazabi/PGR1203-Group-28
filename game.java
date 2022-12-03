@@ -113,6 +113,7 @@ public class game{
         else{
             getCurrentPlayer().setPos(currPos + distance);
         }
+        getCurrentPlayer().setMoves();
     }
 
     /*
@@ -143,9 +144,10 @@ public class game{
     }
 
     public void displayRiver(){
-        System.out.printf("\n Turn: %d",turn);
-        System.out.printf("\nPlayer 1's position: %d\n",Players[0].getPos()+1);
-        System.out.printf("Player 2's position: %d\n",Players[1].getPos()+1);
+        for(int i = 0; i < Players.length;i++){
+            System.out.printf("------------------------------------\nPlayer %d has %d coins and has made %d moves\n",i+1,Players[i].getCoins(),Players[i].getMoves());
+            System.out.printf("\nPlayer %d's position: %d\n---------------------------\n",i+1,Players[i].getPos()+1);
+        }
         System.out.println("====================================================================================================");
         for(int i = 0; i<99;i++){
             if(Players[0].getPos() == i ){
@@ -173,10 +175,10 @@ public class game{
 
     public void displayEndScreen(){
         System.out.println(" ");
-        System.out.println("|||||||||||||||||||||||||");
+        System.out.println("============================================================");
         System.out.println("Thanks for playing!");
         System.out.printf("\nThe winner is %s with a score of: %d and %d coins!!\n",Players[checkWinner()].getName(),Players[checkWinner()].getScore(),Players[checkWinner()].getCoins());
-        System.out.println("|||||||||||||||||||||||||");
+        System.out.println("============================================================");
         System.out.println(" ");
 
     }
@@ -211,7 +213,7 @@ public class game{
                     if(num >= 0 && num <= Players[j].getCoins()){
                         betCheck = false;
                         bets[i] += num;
-                        Players[j].setCoins(Players[j].getCoins()-num);
+                        Players[j].setCoins(-num);
                         break;
                     }
                     else if(num == -1){
@@ -241,6 +243,7 @@ public class game{
         System.out.println(" ");
         System.out.println("The game will now begin! Have fun!");
     }
+
     public void checkMileStone(){
         int ms = -1;
 
@@ -250,16 +253,18 @@ public class game{
                 break;
             }
         }
-
         if(ms != -1){
+            System.out.println("$$$$$==========================================================$$$$$");
             if(bets[ms] == 0){
                 System.out.printf("\nSorry %s you landed on a milestone that has 0 coins on it\n",getCurrentPlayer().getName());
             }
             else{
-                System.out.printf("\nCongratulations %s you have landed on a milestone, you've earned %d coins\n",getCurrentPlayer().getName(),bets[ms]);
+                System.out.printf("\nCongratulations %s you have landed on a milestone, you've earned %d coins\n\n",getCurrentPlayer().getName(),bets[ms]);
+                getCurrentPlayer().setCoins(bets[ms]); 
+                System.out.printf("\nYour new total is: %d\n",getCurrentPlayer().getCoins());
+                bets[ms] = 0;
             }
-            getCurrentPlayer().setCoins(getCurrentPlayer().getCoins() + bets[ms]); 
-            bets[ms] = 0;
+            System.out.println("$$$$$==========================================================$$$$$");
         }
     }
 
@@ -272,13 +277,7 @@ public class game{
      */
     public void setScores(){ 
         int score;
-        int pTurn;
-        if(turn % 2 == 0){
-            pTurn = turn / 2;
-        }
-        else{
-            pTurn = (turn-1)/ 2;
-        } 
+        int pTurn = Players[checkWinner()].getMoves();
 
         if(pTurn <= 15){
             score = 1000;
@@ -292,7 +291,7 @@ public class game{
         else{
             score = 100;
         }
-        Players[checkWinner()].setScore(score);
+        Players[checkWinner()].setScore(score + Players[checkWinner()].getCoins());
     }
 
     public void checkScores(){

@@ -3,12 +3,14 @@ public class player{
     private String name;
     private int pos;
     private int coins;
+    private int moves;
 
     public player(String n){
         name = n;
         score = 0;
         pos = 0;
         coins = 100;
+        moves = 0;
     }
 
     public String getName(){
@@ -40,6 +42,14 @@ public class player{
     }
 
     public void setCoins(int c){
-        coins = c;
+        coins += c;
+    }
+
+    public int getMoves(){
+        return moves;
+    }
+
+    public void setMoves(){
+        moves += 1;
     }
 }
