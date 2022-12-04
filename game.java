@@ -321,8 +321,6 @@ public class game{
      * Formats to "PlayerName  :  PlayerScore"
      */
     public void writeScore(player Player){
-
-
         try{
             FileWriter fw = new FileWriter(file,true);
             PrintWriter pw = new PrintWriter(fw);
@@ -332,9 +330,5 @@ public class game{
         } catch(IOException e){
             System.out.println("File not found writeScore");
         }
-    }
-
-    public void getHighScores(){
-        
     }
 }
