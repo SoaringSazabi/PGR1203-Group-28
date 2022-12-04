@@ -99,9 +99,8 @@ public class game{
             for(int j = count+1; j < temp.length;j++){
                 temp[j] = getHighScores()[j-1];
             }
-            writeScore(temp);
         }
-
+        writeScore(temp);
     }
 
     /*
