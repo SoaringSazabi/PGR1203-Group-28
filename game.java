@@ -41,27 +41,50 @@ public class game{
        River = createRiver();
     }
     
-    public int getTurn(){
-        return turn;
-    }
-
-    public void nextTurn() {
-        turn += 1;
-    }
-
-    public player[] getPlayers(){
-        return Players;
-    }
-
     /*
-     * Returns player object of the player whose turn it is
-    */
-    public player getCurrentPlayer(){
-        int currPlayer = 0; //indicates current player(1 or 2) for print statement below
-        if(turn % 2 == 0){
-            currPlayer = 1;
+     * Checks the cell player has landed on and adjusts their position if 
+     */
+    public void checkCell(){
+        if(River[getCurrentPlayer().getPos()].getType() == currentType){
+            System.out.println("++++++++++++++++++++++++++++++++++++++++++++");
+            System.out.printf("\nPlayer %s has landed on a Current, you have been moved %d spaces forward\n",getCurrentPlayer().getName(),River[getCurrentPlayer().getPos()].getEffect());
+            System.out.println("++++++++++++++++++++++++++++++++++++++++++++");
+            movePlayer(River[getCurrentPlayer().getPos()].getEffect());
         }
-        return Players[currPlayer];
+        else if(River[getCurrentPlayer().getPos()].getType() == trapType){
+            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            System.out.printf("\nPlayer %s has landed on a Trap, you have been moved %d spaces backwards\n",getCurrentPlayer().getName(),River[getCurrentPlayer().getPos()].getEffect());
+            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            movePlayer(0 - River[getCurrentPlayer().getPos()].getEffect());
+        }
+
+        int ms = -1;
+
+        for(int i = 0;i<milestones.length;i++){
+            if(getCurrentPlayer().getPos() == milestones[i]){
+                ms = i;
+                break;
+            }
+        }
+        if(ms != -1){
+            System.out.println("$$$$$==========================================================$$$$$");
+            if(bets[ms] == 0){
+                System.out.printf("\nSorry %s you landed on a milestone that has 0 coins on it\n",getCurrentPlayer().getName());
+            }
+            else{
+                System.out.printf("\nCongratulations %s you have landed on a milestone, you've earned %d coins\n\n",getCurrentPlayer().getName(),bets[ms]);
+                getCurrentPlayer().setCoins(bets[ms]); 
+                System.out.printf("\nYour new total is: %d\n",getCurrentPlayer().getCoins());
+                bets[ms] = 0;
+            }
+            System.out.println("$$$$$==========================================================$$$$$");
+        }
+    }
+
+    public void checkScores(){
+        if(checkWinner() >= 0){
+            writeScore(Players[checkWinner()]);
+        }
     }
 
     /*
@@ -99,49 +122,39 @@ public class game{
         return tempRiver;
     }
 
-    /*
-     * Adjusts chosen player's position 
-     * If the input distance moves the player past cell 100 the players position will be set to 100
-     */
-    public void movePlayer(int distance){
-        int currPos = getCurrentPlayer().getPos();
-        if(currPos + distance > 99){
-            getCurrentPlayer().setPos(99);
-        }
-        else if(currPos + distance < 0){
-            getCurrentPlayer().setPos(0);
-        }
-        else{
-            getCurrentPlayer().setPos(currPos + distance);
-        }
-        getCurrentPlayer().setMoves();
-    }
+    public void displayEndScreen(){
+        System.out.println(" ");
+        System.out.println("============================================================");
+        System.out.println("Thanks for playing!");
+        System.out.printf("\n The winner is %s!!\nYou won the game in %d moves with: %d coins\nYour final score is: %d pts\n",Players[checkWinner()].getName()
+                                                                                                                                    ,Players[checkWinner()].getMoves()
+                                                                                                                                    ,Players[checkWinner()].getCoins()
+                                                                                                                                    ,Players[checkWinner()].getScore());
+        System.out.println("============================================================");
+        System.out.println(" ");
 
-    /*
-     * Checks the cell player has landed on and adjusts their position if 
-     */
-    public void checkCell(){
-        if(River[getCurrentPlayer().getPos()].getType() == currentType){
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++");
-            System.out.printf("\nPlayer %s has landed on a Current, you have been moved %d spaces forward\n",getCurrentPlayer().getName(),River[getCurrentPlayer().getPos()].getEffect());
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++");
-            movePlayer(River[getCurrentPlayer().getPos()].getEffect());
+        String score = "";
+        try{
+            Scanner scan = new Scanner(file);
+            System.out.println("^^^=========================^^^");
+            System.out.println("        Game High Scores    ");
+            int rank = 1;
+            for(int i = 0; i < 10;i++){
+                if(scan.hasNextLine()){
+                    score = scan.nextLine();
+                    if(!score.isBlank()){
+                        System.out.printf("#%d  %s\n",rank,score);
+                        rank++;
+                    }
+                }
+            }
+            System.out.println("^^^=========================^^^");
+            
+            scan.close();
+        } catch(FileNotFoundException exception){
+            System.out.println("File not found displayHighScore");
         }
-        else if(River[getCurrentPlayer().getPos()].getType() == trapType){
-            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-            System.out.printf("\nPlayer %s has landed on a Trap, you have been moved %d spaces backwards\n",getCurrentPlayer().getName(),River[getCurrentPlayer().getPos()].getEffect());
-            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-            movePlayer(0 - River[getCurrentPlayer().getPos()].getEffect());
-        }
-    }
 
-    /*
-     * Generates random number to be used as dice rolling feature
-     */
-    public int rollDice(){
-        int dice = random.nextInt(5) + 1;
-        System.out.printf("\nYou rolled a %d\n",dice);
-        return dice;
     }
 
     public void displayRiver(){
@@ -174,14 +187,46 @@ public class game{
         System.out.printf("\nPlayer %s please press enter to roll the dice.\n",getCurrentPlayer().getName());
     }
 
-    public void displayEndScreen(){
-        System.out.println(" ");
-        System.out.println("============================================================");
-        System.out.println("Thanks for playing!");
-        System.out.printf("\nThe winner is %s with a score of: %d and %d coins!!\n",Players[checkWinner()].getName(),Players[checkWinner()].getScore(),Players[checkWinner()].getCoins());
-        System.out.println("============================================================");
-        System.out.println(" ");
+    /*
+     * Returns player object of the player whose turn it is
+    */
+    public player getCurrentPlayer(){
+        int currPlayer = 0; //indicates current player(1 or 2) for print statement below
+        if(turn % 2 == 0){
+            currPlayer = 1;
+        }
+        return Players[currPlayer];
+    }
 
+    public void nextTurn() {
+        turn += 1;
+    }
+
+    /*
+     * Adjusts chosen player's position 
+     * If the input distance moves the player past cell 100 the players position will be set to 100
+     */
+    public void movePlayer(int distance){
+        int currPos = getCurrentPlayer().getPos();
+        if(currPos + distance > 99){
+            getCurrentPlayer().setPos(99);
+        }
+        else if(currPos + distance < 0){
+            getCurrentPlayer().setPos(0);
+        }
+        else{
+            getCurrentPlayer().setPos(currPos + distance);
+        }
+        getCurrentPlayer().setMoves();
+    }
+ 
+    /*
+     * Generates random number to be used as dice rolling feature
+     */
+    public int rollDice(){
+        int dice = random.nextInt(5) + 1;
+        System.out.printf("\nYou rolled a %d\n",dice);
+        return dice;
     }
    
     /*
@@ -244,36 +289,13 @@ public class game{
         System.out.println("The game will now begin! Have fun!");
     }
 
-    public void checkMileStone(){
-        int ms = -1;
-
-        for(int i = 0;i<milestones.length;i++){
-            if(getCurrentPlayer().getPos() == milestones[i]){
-                ms = i;
-                break;
-            }
-        }
-        if(ms != -1){
-            System.out.println("$$$$$==========================================================$$$$$");
-            if(bets[ms] == 0){
-                System.out.printf("\nSorry %s you landed on a milestone that has 0 coins on it\n",getCurrentPlayer().getName());
-            }
-            else{
-                System.out.printf("\nCongratulations %s you have landed on a milestone, you've earned %d coins\n\n",getCurrentPlayer().getName(),bets[ms]);
-                getCurrentPlayer().setCoins(bets[ms]); 
-                System.out.printf("\nYour new total is: %d\n",getCurrentPlayer().getCoins());
-                bets[ms] = 0;
-            }
-            System.out.println("$$$$$==========================================================$$$$$");
-        }
-    }
-
     /*
      * Sets all players scores at the end of the game
      * Score is calculated:
      * turn < 10 = 1000pts
      * turn 10 - 20 = 1000pts - (100pts for every 2 turns after the 10th turn)
      * turn 20+ = 100pts
+     * The total coins the player ends the game with is also added to their final score
      */
     public void setScores(){ 
         int score;
@@ -294,12 +316,10 @@ public class game{
         Players[checkWinner()].setScore(score + Players[checkWinner()].getCoins());
     }
 
-    public void checkScores(){
-        if(checkWinner() >= 0){
-            writeScore(Players[checkWinner()]);
-        }
-    }
-
+    /*
+     * Writes winning players score in the text document highScores.txt
+     * Formats to "PlayerName  :  PlayerScore"
+     */
     public void writeScore(player Player){
         try{
             FileWriter fw = new FileWriter(file,true);
@@ -312,22 +332,5 @@ public class game{
         }
     }
 
-    public void displayHighScores(){
-        String score = "";
-        try{
-            Scanner scan = new Scanner(file);
-            System.out.println("^^^=========================^^^");
-            System.out.println("        Game High Scores    ");
-            while(scan.hasNextLine()){
-                score = scan.nextLine();
-                System.out.println(score);
-                System.out.println(" ");
-            }
-            System.out.println("^^^=========================^^^");
-            
-            scan.close();
-        } catch(FileNotFoundException exception){
-            System.out.println("File not found displayHighScore");
-        }
-    }
+
 }

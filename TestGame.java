@@ -70,13 +70,11 @@ public class TestGame{
                     input.nextLine();
                     game.movePlayer(game.rollDice());
                     game.checkCell();
-                    game.checkMileStone();
                     game.nextTurn();
                 }
                 game.setScores();
-                game.displayEndScreen();
                 game.checkScores();
-                game.displayHighScores();
+                game.displayEndScreen();
                 start = false;
                 menuCheck = true;
                 menuChoice = -1;
