@@ -82,25 +82,9 @@ public class game{
     }
 
     public void checkScores(){
-        String[][] temp = getHighScores();
-        String[] player = {Players[checkWinner()].getName(),Integer.toString(Players[checkWinner()].getScore())};
-        int count = 0;
-        for(int i = 0; i < temp.length;i++){
-            if(Players[checkWinner()].getScore()> Integer.parseInt(temp[i][1])){
-                temp[i] = player;
-                count = i;
-                break;
-            }
+        if(checkWinner() >= 0){
+            writeScore(Players[checkWinner()]);
         }
-        if(count == 5 || count == 0){
-
-        }
-        else{
-            for(int j = count+1; j < temp.length;j++){
-                temp[j] = getHighScores()[j-1];
-            }
-        }
-        writeScore(temp);
     }
 
     /*
@@ -134,17 +118,12 @@ public class game{
         }
         
         Collections.shuffle(Arrays.asList(tempRiver));//Shuffle all cells
-        //sets last cell in river to a blank cell after shuffle to avoid cases where players cannot end the game because a trap on the last cell will move them backwards forever
-        tempRiver[99].setType(0);
-        tempRiver[99].setEffect(0);
 
         return tempRiver;
     }
 
     public void displayEndScreen(){
-
-        String[][] highScores= new String[5][2];
-        highScores = getHighScores();
+        System.out.println(" ");
         System.out.println("============================================================");
         System.out.println("Thanks for playing!");
         System.out.printf("\n The winner is %s!!\nYou won the game in %d moves with: %d coins\nYour final score is: %d pts\n",Players[checkWinner()].getName()
@@ -153,13 +132,21 @@ public class game{
                                                                                                                                     ,Players[checkWinner()].getScore());
         System.out.println("============================================================");
         System.out.println(" ");
+
+        String score = "";
         try{
             Scanner scan = new Scanner(file);
             System.out.println("^^^=========================^^^");
             System.out.println("        Game High Scores    ");
-
-            for(int i = 0;i < highScores.length;i++){
-                System.out.printf("\n#%d %s | %s\n",i+1,highScores[i][0],highScores[i][1]);
+            int rank = 1;
+            for(int i = 0; i < 10;i++){
+                if(scan.hasNextLine()){
+                    score = scan.nextLine();
+                    if(!score.isBlank()){
+                        System.out.printf("#%d  %s\n",rank,score);
+                        rank++;
+                    }
+                }
             }
             System.out.println("^^^=========================^^^");
             
@@ -261,10 +248,6 @@ public class game{
         }
     }
 
-    /*
-     * Gets bets from players for each of the milestones on the river
-     * Players cannot bet more than the 100 coins they have avaliable 
-     */
     public void setBets(){
         for(int i = 0;i<bets.length;i++){
             for(int j = 0; j <Players.length;j++){
@@ -337,52 +320,21 @@ public class game{
      * Writes winning players score in the text document highScores.txt
      * Formats to "PlayerName  :  PlayerScore"
      */
-    public void writeScore(String[][] newScores){
+    public void writeScore(player Player){
+
+
         try{
-            FileWriter fw = new FileWriter(file,false);
+            FileWriter fw = new FileWriter(file,true);
             PrintWriter pw = new PrintWriter(fw);
 
-            for(int i = 0; i < newScores.length;i++){
-                pw.println(newScores[i][0]+","+newScores[i][1]);
-            }
+            pw.printf("\n%s  :  %d",Player.getName(),Player.getScore());
             pw.close();
-
         } catch(IOException e){
             System.out.println("File not found writeScore");
         }
     }
 
-    public String[][] getHighScores(){
-        int count = 0;
-        String[][] tempScores = {{" ","0"},{" ","0"},{" ","0"},{" ","0"},{" ","0"}};
-        try{
-            Scanner scan = new Scanner(file);
-
-            for(int i = 0; i<5;i++){
-                if(scan.hasNextLine()){
-                    String[] score = scan.nextLine().split(",",2);
-                    tempScores[i] = score;
-                }
-            }  
-        scan.close();
-
-        }catch(FileNotFoundException exception){
-            System.out.println("File not found in getHighscores");
-        }
-
-        //for loop that sorts highscores in decending order
-        for(int i = 0;i<tempScores.length;i++){
-            for(int j = i + 1;j < tempScores.length;j++){
-                String[] temp = {" ","0"};
-                if(Integer.parseInt(tempScores[j][1]) > Integer.parseInt(tempScores[i][1])){
-                    temp = tempScores[i];
-                    tempScores[i] = tempScores[j];
-                    tempScores[j] = temp;
-                }
-            }
-        }
+    public void getHighScores(){
         
-        return tempScores;
     }
-
 }
