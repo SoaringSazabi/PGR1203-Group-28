@@ -42,7 +42,7 @@ public class game{
     }
     
     /*
-     * Checks the cell player has landed on and adjusts their position if 
+     * Checks the cell player has landed on and adjusts their position if its a current or trap
      */
     public void checkCell(){
         if(River[getCurrentPlayer().getPos()].getType() == currentType){
@@ -119,9 +119,16 @@ public class game{
         
         Collections.shuffle(Arrays.asList(tempRiver));//Shuffle all cells
 
+        //sets last cell to blank to prevent infinite loop in game
+        tempRiver[99].setEffect(0);
+        tempRiver[99].setType(0);
+
         return tempRiver;
     }
 
+    /*
+     * Displays highscores and congratulations message to the winner
+     */
     public void displayEndScreen(){
         System.out.println(" ");
         System.out.println("============================================================");
@@ -157,6 +164,10 @@ public class game{
 
     }
 
+    /*
+     * Displays river to players
+     * Also displays their current postion,moves and coins
+     */
     public void displayRiver(){
         for(int i = 0; i < Players.length;i++){
             System.out.printf("------------------------------------\nPlayer %d has %d coins and has made %d moves\n",i+1,Players[i].getCoins(),Players[i].getMoves());
@@ -248,6 +259,13 @@ public class game{
         }
     }
 
+    /*
+     * Sets bets for each of the 4 milestones
+     * players cannot bet more than the amount of coins they have avaliable
+     * Will display how much is on each milestone
+     * Each milestone has 20 coins avaliable even if no bet is placed
+     * Eaah bet will also gain 25% when placed 
+     */
     public void setBets(){
         for(int i = 0;i<bets.length;i++){
             for(int j = 0; j <Players.length;j++){

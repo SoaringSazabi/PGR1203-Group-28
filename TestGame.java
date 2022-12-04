@@ -14,14 +14,13 @@ public class TestGame{
             System.out.println("WELCOME TO THE RIVER");
             System.out.println("Please select an option: ");
             System.out.println("[1] Start Game");
-            System.out.println("[2] View Game Rules");
-            System.out.println("[3] Exit");
+            System.out.println("[2] Exit");
         
             //Loop checks if user input a valid menu choice
             //Will continually ask user to input a valid choice if they have not
             while(menuCheck){
 
-                if(menuChoice <= 3 && menuChoice >= 1){
+                if(menuChoice <= 2 && menuChoice >= 1){
                     menuCheck = false;
                     break;
                 }
@@ -45,12 +44,9 @@ public class TestGame{
 
             //switch for menu choices
             switch(menuChoice){
-                case 3:
+                case 2:
                     main = false;
                     System.out.println("Thanks for playing!");
-                    break;
-                case 2:
-                    System.out.println("Game Rules");
                     break;
                 case 1:
                     start = true;
