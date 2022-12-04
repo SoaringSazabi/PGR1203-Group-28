@@ -2,6 +2,7 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,7 +35,7 @@ public class game{
        Players[1] = p2;
        
        for(int i = 0;i<bets.length;i++){
-        bets[i] = 0;
+        bets[i] = 20;
        }
 
        River = createRiver();
@@ -52,7 +53,7 @@ public class game{
         return Players;
     }
 
-        /*
+    /*
      * Returns player object of the player whose turn it is
     */
     public player getCurrentPlayer(){
@@ -212,7 +213,7 @@ public class game{
                     
                     if(num >= 0 && num <= Players[j].getCoins()){
                         betCheck = false;
-                        bets[i] += num;
+                        bets[i] += Math.round(num*1.25);
                         Players[j].setCoins(-num);
                         break;
                     }
@@ -236,7 +237,6 @@ public class game{
                 }
             }
         }
-
         for(int i = 0;i<bets.length;i++){
             System.out.printf("\nMilestone %d has a total bet of %d\n",i+1,bets[i]);
         }
@@ -279,17 +279,17 @@ public class game{
         int score;
         int pTurn = Players[checkWinner()].getMoves();
 
-        if(pTurn <= 15){
+        if(pTurn <= 25){
             score = 1000;
         }
-        else if(pTurn > 15 && pTurn <25 ){
+        else if(pTurn > 25 && pTurn <40 ){
+            score = 750;
+        }
+        else if(pTurn > 40 && pTurn <60){
             score = 500;
         }
-        else if(pTurn > 25 && pTurn <50){
-            score = 250;
-        }
         else{
-            score = 100;
+            score = 250;
         }
         Players[checkWinner()].setScore(score + Players[checkWinner()].getCoins());
     }
@@ -305,11 +305,29 @@ public class game{
             FileWriter fw = new FileWriter(file,true);
             PrintWriter pw = new PrintWriter(fw);
 
-            pw.printf("\n%s  :  %d\n",Player.getName(),Player.getScore());
+            pw.printf("\n%s  :  %d",Player.getName(),Player.getScore());
             pw.close();
         } catch(IOException e){
-            System.out.println("Error: writeScore");
+            System.out.println("File not found writeScore");
         }
     }
 
+    public void displayHighScores(){
+        String score = "";
+        try{
+            Scanner scan = new Scanner(file);
+            System.out.println("^^^=========================^^^");
+            System.out.println("        Game High Scores    ");
+            while(scan.hasNextLine()){
+                score = scan.nextLine();
+                System.out.println(score);
+                System.out.println(" ");
+            }
+            System.out.println("^^^=========================^^^");
+            
+            scan.close();
+        } catch(FileNotFoundException exception){
+            System.out.println("File not found displayHighScore");
+        }
+    }
 }

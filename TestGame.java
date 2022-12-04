@@ -14,7 +14,7 @@ public class TestGame{
             System.out.println("WELCOME TO THE RIVER");
             System.out.println("Please select an option: ");
             System.out.println("[1] Start Game");
-            System.out.println("[2] View High Scores");
+            System.out.println("[2] View Game Rules");
             System.out.println("[3] Exit");
         
             //Loop checks if user input a valid menu choice
@@ -50,7 +50,7 @@ public class TestGame{
                     System.out.println("Thanks for playing!");
                     break;
                 case 2:
-                    System.out.println("High Scores");
+                    System.out.println("Game Rules");
                     break;
                 case 1:
                     start = true;
@@ -76,6 +76,7 @@ public class TestGame{
                 game.setScores();
                 game.displayEndScreen();
                 game.checkScores();
+                game.displayHighScores();
                 start = false;
                 menuCheck = true;
                 menuChoice = -1;
